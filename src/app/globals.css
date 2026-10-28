@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-gold: #D4AF62;
+  --color-gold-light: #E5C887;
+  --color-gold-dark: #A98746;
+  --color-navy: #071426;
+  --color-black: #080A0F;
+  --color-ivory: #FAF8F5;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  color: #071426;
+  background-color: #080A0F;
+  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Selection */
+::selection {
+  background: rgba(212, 175, 98, 0.4);
+  color: #071426;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #080A0F;
+}
+::-webkit-scrollbar-thumb {
+  background: #D4AF62;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #A98746;
+}
+
+/* 100% Transparent Luxury Styling - Clear Background Visibility Throughout */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(212, 175, 98, 0.45);
+  box-shadow: 0 8px 32px rgba(7, 20, 38, 0.06);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(212, 175, 98, 0.35);
+  box-shadow: 0 4px 20px rgba(7, 20, 38, 0.05);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(212, 175, 98, 0.75);
+}
+
+.glass-nav-scrolled {
+  background: transparent;
+}
+
+/* Gold Gradient Text */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #A98746 0%, #D4AF62 50%, #8B6F3E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dialog Styles complying with Modern Web Guidance */
+dialog {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: 100vw;
+  max-height: 100vh;
+}
+
+dialog::backdrop {
+  background-color: rgba(7, 20, 38, 0.65);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

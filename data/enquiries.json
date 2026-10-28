@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Kavita Rao",
+    "phone": "+91 98765 43210",
+    "email": "kavita.rao@example.com",
+    "enquiryType": "Buying Property",
+    "budget": "AED 3M - 7M",
+    "location": "Dubai Marina",
+    "message": "Interested in luxury 2-bed waterfront apartments with high rental yields.",
+    "consent": true,
+    "source": "Automated Acceptance Verification",
+    "id": "enq-1793005371405-cvym",
+    "createdAt": "2026-10-26T09:02:51.405Z",
+    "status": "new"
+  },
+  {
+    "id": "enq-sample-1",
+    "name": "Sameer Al-Hashimi",
+    "phone": "+971 50 123 4567",
+    "email": "sameer.h@example.com",
+    "enquiryType": "Buying Property",
+    "budget": "AED 10M - 20M",
+    "location": "Palm Jumeirah",
+    "message": "Seeking a beachfront villa or penthouse for immediate acquisition.",
+    "consent": true,
+    "createdAt": "2026-10-25T09:02:09.167Z",
+    "status": "new",
+    "source": "Website Contact Form"
+  },
+  {
+    "id": "enq-sample-2",
+    "name": "David Richardson",
+    "phone": "+44 7911 123456",
+    "email": "d.richardson@example.co.uk",
+    "enquiryType": "Investment Assistance",
+    "budget": "AED 5M - 10M",
+    "location": "Downtown Dubai",
+    "message": "Looking into off-plan investment with long-term rental yield potential.",
+    "consent": true,
+    "createdAt": "2026-10-24T09:02:09.167Z",
+    "status": "contacted",
+    "source": "Hero Scene CTA"
+  }
+]
