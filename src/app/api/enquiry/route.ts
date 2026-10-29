@@ -4,7 +4,14 @@ import { getEnquiries, saveEnquiry, updateEnquiryStatus, deleteEnquiry } from "@
 export async function GET() {
   try {
     const list = getEnquiries();
-    return NextResponse.json({ success: true, enquiries: list });
+    return NextResponse.json(
+      { success: true, enquiries: list },
+      {
+        headers: {
+          "Cache-Control": "private, no-cache, no-store, must-revalidate",
+        },
+      }
+    );
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

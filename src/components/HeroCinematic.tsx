@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Volume2, VolumeX } from "lucide-react";
 import { CINEMATIC_SCENES } from "@/lib/scenes-config";
 
@@ -10,48 +10,69 @@ export default function HeroCinematic() {
   const [isMuted, setIsMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // Calculate active scene based on container scroll progress
+  // Performance guards against unnecessary re-renders & layout thrashing
+  const activeIndexRef = useRef(0);
+  const isTickingRef = useRef(false);
+
+  // Throttled scroll handling with requestAnimationFrame (60/120fps lock)
   useEffect(() => {
     const handleScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const containerHeight = containerRef.current.offsetHeight;
-      const windowHeight = window.innerHeight;
+      if (isTickingRef.current) return;
+      isTickingRef.current = true;
 
-      const totalScrollable = containerHeight - windowHeight;
-      const currentScroll = -rect.top;
+      window.requestAnimationFrame(() => {
+        if (containerRef.current) {
+          const rect = containerRef.current.getBoundingClientRect();
+          const containerHeight = containerRef.current.offsetHeight;
+          const windowHeight = window.innerHeight;
 
-      if (totalScrollable <= 0) return;
+          const totalScrollable = containerHeight - windowHeight;
+          const currentScroll = -rect.top;
 
-      const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
-      const sceneIndex = Math.min(
-        CINEMATIC_SCENES.length - 1,
-        Math.floor(progress * CINEMATIC_SCENES.length)
-      );
+          if (totalScrollable > 0) {
+            const progress = Math.max(0, Math.min(1, currentScroll / totalScrollable));
+            const sceneIndex = Math.min(
+              CINEMATIC_SCENES.length - 1,
+              Math.floor(progress * CINEMATIC_SCENES.length)
+            );
 
-      setActiveSceneIndex(sceneIndex);
+            // ONLY trigger state re-render if the scene actually changed!
+            if (sceneIndex !== activeIndexRef.current) {
+              activeIndexRef.current = sceneIndex;
+              setActiveSceneIndex(sceneIndex);
+            }
+          }
+        }
+        isTickingRef.current = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Sync mute and play across video elements
+  // Sync mute and play across video elements with zero redundant calls
   useEffect(() => {
     videoRefs.current.forEach((vid, idx) => {
       if (vid) {
-        vid.muted = isMuted;
+        if (vid.muted !== isMuted) {
+          vid.muted = isMuted;
+        }
         if (idx === activeSceneIndex) {
-          vid.play().catch(() => {});
+          if (vid.paused) {
+            vid.play().catch(() => {});
+          }
         } else {
-          vid.pause();
+          if (!vid.paused) {
+            vid.pause();
+          }
         }
       }
     });
   }, [activeSceneIndex, isMuted]);
 
-  // Jump to specific scene
-  const jumpToScene = (index: number) => {
+  // Jump to specific scene with memoized callback
+  const jumpToScene = useCallback((index: number) => {
     if (!containerRef.current) return;
     const containerTop = containerRef.current.offsetTop;
     const containerHeight = containerRef.current.offsetHeight;
@@ -63,7 +84,7 @@ export default function HeroCinematic() {
       top: targetScroll,
       behavior: "smooth",
     });
-  };
+  }, []);
 
   return (
     <section
@@ -75,28 +96,33 @@ export default function HeroCinematic() {
       {/* Sticky Viewport Container */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         {/* 
-          Render 9 Clean HD Video Layers
+          Render 9 Clean HD Video Layers with Adaptive Bandwidth Preloading
           Zero text overlays, zero dark cards, zero background bleed.
-          The video is 100% full-screen, clean, and crystal-clear.
         */}
         <div className="absolute inset-0 w-full h-full bg-black">
-          {CINEMATIC_SCENES.map((scene, idx) => (
-            <video
-              key={scene.id}
-              ref={(el) => {
-                videoRefs.current[idx] = el;
-              }}
-              src={scene.videoSrc}
-              muted={isMuted}
-              autoPlay
-              loop
-              playsInline
-              preload={idx <= 1 ? "auto" : "metadata"}
-              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
-                idx === activeSceneIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
-              }`}
-            />
-          ))}
+          {CINEMATIC_SCENES.map((scene, idx) => {
+            // Adaptive buffering: Only preload the active scene and immediate neighbors
+            const isNearActive = Math.abs(idx - activeSceneIndex) <= 1;
+            const preloadStrategy = idx === 0 ? "auto" : isNearActive ? "auto" : "none";
+
+            return (
+              <video
+                key={scene.id}
+                ref={(el) => {
+                  videoRefs.current[idx] = el;
+                }}
+                src={scene.videoSrc}
+                muted={isMuted}
+                autoPlay={idx === 0}
+                loop
+                playsInline
+                preload={preloadStrategy}
+                className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ease-in-out ${
+                  idx === activeSceneIndex ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none"
+                }`}
+              />
+            );
+          })}
         </div>
 
         {/* 

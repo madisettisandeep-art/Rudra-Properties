@@ -92,6 +92,33 @@ dialog::backdrop {
   -webkit-backdrop-filter: blur(10px);
 }
 
+/* Modern Web Guidance: Defer rendering off-screen heavy sections */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 700px;
+}
+
+/* Loading Skeleton Shimmer Animation */
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(212, 175, 98, 0.08) 25%,
+    rgba(212, 175, 98, 0.22) 50%,
+    rgba(212, 175, 98, 0.08) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.8s infinite ease-in-out;
+}
+
 /* Reduced Motion Preference */
 @media (prefers-reduced-motion: reduce) {
   *, ::before, ::after {

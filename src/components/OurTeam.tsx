@@ -2,10 +2,15 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { Users, ArrowRight, MessageCircle, Linkedin, ExternalLink } from "lucide-react";
 import { TEAM_MEMBERS, TeamMember } from "@/lib/team-data";
-import TeamModal from "./TeamModal";
 import { getWhatsAppUrl } from "@/lib/whatsapp";
+
+// Split code into chunks: Dynamically import heavy team modal on-demand
+const TeamModal = dynamic(() => import("./TeamModal"), {
+  ssr: false,
+});
 
 export default function OurTeam() {
   const [selectedMemberIndex, setSelectedMemberIndex] = useState(0);
@@ -13,26 +18,39 @@ export default function OurTeam() {
   const sectionRef = useRef<HTMLElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
 
-  // Sync scroll progress through team section to highlight active card
+  const selectedIndexRef = useRef(0);
+  const isTickingRef = useRef(false);
+
+  // Throttled scroll progress through team section to eliminate unnecessary re-renders
   useEffect(() => {
     const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
+      if (isTickingRef.current) return;
+      isTickingRef.current = true;
 
-      if (rect.top <= windowHeight && rect.bottom >= 0) {
-        const total = rect.height + windowHeight;
-        const current = windowHeight - rect.top;
-        const progress = Math.max(0, Math.min(1, current / total));
-        setScrollProgress(progress);
+      window.requestAnimationFrame(() => {
+        if (sectionRef.current) {
+          const rect = sectionRef.current.getBoundingClientRect();
+          const windowHeight = window.innerHeight;
 
-        // Dynamically select member based on progress
-        const memberIdx = Math.min(
-          TEAM_MEMBERS.length - 1,
-          Math.floor(progress * TEAM_MEMBERS.length)
-        );
-        setSelectedMemberIndex(memberIdx);
-      }
+          if (rect.top <= windowHeight && rect.bottom >= 0) {
+            const total = rect.height + windowHeight;
+            const current = windowHeight - rect.top;
+            const progress = Math.max(0, Math.min(1, current / total));
+            setScrollProgress(progress);
+
+            // Dynamically select member based on progress ONLY if index changed
+            const memberIdx = Math.min(
+              TEAM_MEMBERS.length - 1,
+              Math.floor(progress * TEAM_MEMBERS.length)
+            );
+            if (memberIdx !== selectedIndexRef.current) {
+              selectedIndexRef.current = memberIdx;
+              setSelectedMemberIndex(memberIdx);
+            }
+          }
+        }
+        isTickingRef.current = false;
+      });
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -51,7 +69,7 @@ export default function OurTeam() {
     <section
       id="team"
       ref={sectionRef}
-      className="relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden"
+      className="content-visibility-auto relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}

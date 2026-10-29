@@ -15,7 +15,7 @@ export default function Footer() {
 
   return (
     <>
-      <footer className="relative pt-20 pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF62]/40 bg-transparent overflow-hidden">
+      <footer className="content-visibility-auto relative pt-20 pb-12 px-4 sm:px-6 lg:px-8 border-t border-[#D4AF62]/40 bg-transparent overflow-hidden">
         <div className="max-w-7xl mx-auto">
           {/* Main Footer Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-12 pb-16 border-b border-[#D4AF62]/30">
@@ -27,6 +27,7 @@ export default function Footer() {
                   alt="Rudra Properties Logo"
                   width={200}
                   height={100}
+                  loading="lazy"
                   className="h-12 w-auto object-contain"
                 />
               </div>

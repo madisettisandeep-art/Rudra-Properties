@@ -8,7 +8,7 @@ import { getWhatsAppUrl, RUDRA_YOUTUBE_URL, RUDRA_INSTAGRAM_URL, RUDRA_FACEBOOK_
 
 export default function AboutUs() {
   return (
-    <section id="about" className="relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section id="about" className="content-visibility-auto relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">

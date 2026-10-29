@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MessageCircle, Menu, X, ArrowUpRight, Youtube, Instagram, Facebook } from "lucide-react";
@@ -20,24 +20,38 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
 
+  const isScrolledRef = useRef(false);
+  const activeSectionRef = useRef("home");
+  const isTickingRef = useRef(false);
+
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 80) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      if (isTickingRef.current) return;
+      isTickingRef.current = true;
 
-      const sections = ["home", "about", "team", "properties", "services", "contact"];
-      const current = sections.find((sec) => {
-        const el = document.getElementById(sec);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          return rect.top <= 200 && rect.bottom >= 200;
+      window.requestAnimationFrame(() => {
+        const scrolled = window.scrollY > 80;
+        if (scrolled !== isScrolledRef.current) {
+          isScrolledRef.current = scrolled;
+          setIsScrolled(scrolled);
         }
-        return false;
+
+        const sections = ["home", "about", "team", "properties", "services", "contact"];
+        for (const sec of sections) {
+          const el = document.getElementById(sec);
+          if (el) {
+            const rect = el.getBoundingClientRect();
+            if (rect.top <= 250 && rect.bottom >= 150) {
+              if (sec !== activeSectionRef.current) {
+                activeSectionRef.current = sec;
+                setActiveSection(sec);
+              }
+              break;
+            }
+          }
+        }
+        isTickingRef.current = false;
       });
-      if (current) setActiveSection(current);
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });

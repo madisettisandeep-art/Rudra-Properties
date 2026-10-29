@@ -31,7 +31,7 @@ export default function ServicesSection() {
   };
 
   return (
-    <section id="services" className="relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section id="services" className="content-visibility-auto relative py-28 sm:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-16 sm:mb-20">
